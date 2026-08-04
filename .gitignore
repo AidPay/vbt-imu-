@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated output (not source)
+sessions/
+data/raw/test/
+
+# OS + editor junk
+.DS_Store
+Thumbs.db
+.vscode/
