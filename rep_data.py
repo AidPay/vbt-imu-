@@ -99,11 +99,15 @@ def process_file(path, cutoff_hz=5.0, sample_rate=100.0):
 
 
 def session_aggregates(reps):
-    """rep count, avg asymmetry, max tilt -- the session-level summary."""
-    if not reps:
-        return {"rep_count": 0, "avg_asymmetry": None, "max_tilt": None}
-    max_tilt = max(max(abs(p) for p in r["pitch"]) for r in reps)
-    avg_asym = sum(r["asymmetry_score"] for r in reps) / len(reps)
+    """rep count, avg asymmetry, max tilt -- the session-level summary.
+    Skips incomplete/aborted reps (empty pitch or no score) so flagged reps
+    don't break the math."""
+    scored = [r for r in reps
+              if r.get("pitch") and r.get("asymmetry_score") is not None]
+    if not scored:
+        return {"rep_count": len(reps), "avg_asymmetry": None, "max_tilt": None}
+    max_tilt = max(max(abs(p) for p in r["pitch"]) for r in scored)
+    avg_asym = sum(r["asymmetry_score"] for r in scored) / len(scored)
     return {
         "rep_count": len(reps),
         "avg_asymmetry": round(avg_asym, 4),
